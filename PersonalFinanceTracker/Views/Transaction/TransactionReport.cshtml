@@ -1,0 +1,146 @@
+﻿@model TransactionReportViewModel
+
+@{
+    var incomeCategories = Model.IncomeData.Select(x => x.Category).ToArray();
+    var incomeTotals = Model.IncomeData.Select(x => x.TotalAmount).ToArray();
+    var expenseCategories = Model.ExpenseData.Select(x => x.Category).ToArray();
+    var expenseTotals = Model.ExpenseData.Select(x => x.TotalAmount).ToArray();
+}
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white text-center">
+            <h4 class="mb-0">Transaction Report</h4>
+        </div>
+        <div class="card-body p-4">
+            <div class="table-responsive-custom">
+                <table class="table table-bordered table-hover table-striped text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th colspan="3" class="bg-success text-white">Income</th>
+                            <th colspan="3" class="bg-danger text-white">Expense</th>
+                        </tr>
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Sl No</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Math.Max(Model.IncomeData.Count, Model.ExpenseData.Count); i++)
+                        {
+                            <tr>
+                                <td>@(i + 1 <= Model.IncomeData.Count ? i + 1 : "")</td>
+                                <td>@(i < Model.IncomeData.Count ? Model.IncomeData[i].Category : "")</td>
+                                <td>@(i < Model.IncomeData.Count ? Model.IncomeData[i].TotalAmount.ToString("C") : "")</td>
+
+                                <td>@(i + 1 <= Model.ExpenseData.Count ? i + 1 : "")</td>
+                                <td>@(i < Model.ExpenseData.Count ? Model.ExpenseData[i].Category : "")</td>
+                                <td>@(i < Model.ExpenseData.Count ? Model.ExpenseData[i].TotalAmount.ToString("C") : "")</td>
+                            </tr>
+                        }
+
+                        <tr class="table-success font-weight-bold">
+                            <td colspan="3">Total Income</td>
+                            <td colspan="3">Total Expense</td>
+                        </tr>
+                        <tr class="font-weight-bold">
+                            <td colspan="3">@Model.IncomeData.Sum(x => x.TotalAmount).ToString("C")</td>
+                            <td colspan="3">@Model.ExpenseData.Sum(x => x.TotalAmount).ToString("C")</td>
+                        </tr>
+                        <tr class="table-primary font-weight-bold">
+                            <td colspan="3">Profit</td>
+                            <td colspan="3">
+                                @{
+                                    var profit = Model.IncomeData.Sum(x => x.TotalAmount) - Model.ExpenseData.Sum(x => x.TotalAmount);
+                                }
+                                @profit.ToString("C")
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mt-5">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-success text-white text-center">
+                    Income Breakdown
+                </div>
+                <div class="card-body">
+                    <canvas id="transactionPieChart_inc"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-danger text-white text-center">
+                    Expense Breakdown
+                </div>
+                <div class="card-body">
+                    <canvas id="transactionPieChart_exp"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    const incomeCategories = @Html.Raw(Json.Serialize(incomeCategories));
+    const incomeTotals = @Html.Raw(Json.Serialize(incomeTotals));
+    const incomeColors = incomeCategories.map(() => getRandomColor());
+
+    const ctxIncome = document.getElementById('transactionPieChart_inc').getContext('2d');
+    new Chart(ctxIncome, {
+        type: 'pie',
+        data: {
+            labels: incomeCategories,
+            datasets: [{
+                data: incomeTotals,
+                backgroundColor: incomeColors
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    const expenseCategories = @Html.Raw(Json.Serialize(expenseCategories));
+    const expenseTotals = @Html.Raw(Json.Serialize(expenseTotals));
+    const expenseColors = expenseCategories.map(() => getRandomColor());
+
+    const ctxExpense = document.getElementById('transactionPieChart_exp').getContext('2d');
+    new Chart(ctxExpense, {
+        type: 'pie',
+        data: {
+            labels: expenseCategories,
+            datasets: [{
+                data: expenseTotals,
+                backgroundColor: expenseColors
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+</script>

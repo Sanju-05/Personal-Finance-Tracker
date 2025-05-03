@@ -1,0 +1,43 @@
+﻿@model PersonalFinanceTracker.Models.CreateTransactionDto
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100" style="transform: translateY(-10%);">
+    <div class="card shadow-lg p-4" style="min-width: 400px; max-width: 500px; width: 100%;">
+        <h2 class="text-center mb-4 text-primary">Add Transaction</h2>
+
+        <form asp-action="Create" method="post">
+            <div class="form-group mb-3">
+                <label class="font-weight-bold">Amount</label>
+                <input asp-for="Amount" class="form-control" placeholder="Enter amount" />
+            </div>
+            <div class="form-group mb-3">
+                <label class="font-weight-bold">Category</label>
+                <input asp-for="Category" class="form-control" placeholder="e.g. Food, Salary" />
+            </div>
+            <div class="form-group mb-3">
+                <label class="font-weight-bold">Transaction Type</label>
+                <select asp-for="TransactionType" class="form-control">
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label class="font-weight-bold">Date</label>
+                <input asp-for="Date" type="date" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">💾 Save Transaction</button>
+        </form>
+
+        @if (ViewBag.message != null)
+        {
+            <p class="mt-3 text-danger text-center">@ViewBag.message</p>
+        }
+    </div>
+</div>
+
+<style>
+    input.form-control:focus,
+    select.form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+</style>
